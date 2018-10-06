@@ -4,6 +4,7 @@
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
 #include <Windows.h>
+#include "PAGRenderer.h"
 
 extern "C" {
 	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
@@ -13,19 +14,19 @@ extern "C" {
 // - Esta función callback será llamada cada vez que el área de dibujo
 // OpenGL deba ser redibujada.
 void window_refresh_callback(GLFWwindow *window) {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	PAGRenderer::getInstance()->refresh();
 	// - GLFW usa un doble buffer para que no haya parpadeo. Esta orden
 	// intercambia el buffer back (que se ha estado dibujando) por el
 	// que se mostraba hasta ahora front. Debe ser la última orden de
 	// este callback
 	glfwSwapBuffers(window);
-	std::cout << "Refresh callback called" << std::endl;
 }
 
 // - Esta función callback será llamada cada vez que se cambie el tamaño
 // del área de dibujo OpenGL.
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-	glViewport(0, 0, width, height);
+
+	PAGRenderer::getInstance()->change_viewport_size(width, height);
 	std::cout << "Resize callback called" << std::endl;
 }
 
@@ -35,23 +36,37 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
-	std::cout << "Key callback called" << std::endl;
+	// La eleccion del comportamiento del teclado le corresponde a GLFW a nivel de ventana por 
+	// lo que llamará a la función necesaria de PAGRenderer solo si es necesario porque la 
+	// tecla pulsada tenga que ver con el redibujo de escena
+	if (key == GLFW_KEY_RIGHT_BRACKET && action == GLFW_PRESS)
+		PAGRenderer::getInstance()->zoom(3);
+
+	if (key == GLFW_KEY_SLASH && action == GLFW_PRESS)
+		PAGRenderer::getInstance()->zoom(-3);
+
+	std::cout << "Key callback called, Key " << key << std::endl;
 }
 
 // - Esta función callback será llamada cada vez que se pulse algún botón
 // del ratón sobre el área de dibujo OpenGL.
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
 	if (action == GLFW_PRESS) {
-		std::cout << "Pulsado el boton: " << button << std::endl;
+		PAGRenderer::getInstance()->button_clicked(button);
 	}
 	else if (action == GLFW_RELEASE) {
-		std::cout << "Soltado el boton: " << button << std::endl;
+		PAGRenderer::getInstance()->button_released(button);
 	}
 }
 
 // - Esta función callback será llamada cada vez que se mueva la rueda
 // del ratón sobre el área de dibujo OpenGL.
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
+	if (yoffset > 0)
+		PAGRenderer::getInstance()->zoom(3);
+	else
+		PAGRenderer::getInstance()->zoom(-3);
+
 	std::cout << "Movida la rueda del raton " << xoffset <<
 		" Unidades en horizontal y " << yoffset << " unidades en vertical" << std::endl;
 }
