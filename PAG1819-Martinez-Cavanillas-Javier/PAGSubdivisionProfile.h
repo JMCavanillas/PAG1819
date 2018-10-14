@@ -33,7 +33,7 @@ class PAGSubdivisionProfile
 	public:
 		PAGSubdivisionProfile( std::vector<glm::vec2> points);
 	
-		PAGSubdivisionProfile subdivide(unsigned int times);
+		PAGSubdivisionProfile subdivide(unsigned times);
 
 		ValidityReport status();
 		bool isValid();

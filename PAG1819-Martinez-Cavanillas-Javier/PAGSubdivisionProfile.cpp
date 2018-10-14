@@ -63,13 +63,38 @@ PAGSubdivisionProfile::PAGSubdivisionProfile(std::vector<glm::vec2> points)
 
 }
 
-PAGSubdivisionProfile PAGSubdivisionProfile::subdivide(unsigned int times)
+PAGSubdivisionProfile PAGSubdivisionProfile::subdivide(unsigned times)
 {
 	if (validityStatus_.status == PAGSubdivisionProfile::INVALID)
 		throw new std::invalid_argument("The profile is invalid, cannot subdivide," 
 			"check PAGSubdivisionProfile::status() for further Information");
 
-	return PAGSubdivisionProfile(points_);
+	std::vector<glm::vec2> subdivision_polyline = points_;
+
+	for (unsigned i = 0; i < times; ++i)
+	{
+		std::vector<glm::vec2> resulting_polyline;
+
+		unsigned size = subdivision_polyline.size();
+
+		resulting_polyline.push_back(subdivision_polyline[0]);
+
+		for (unsigned j = 1; i < size - 1; ++j)
+		{
+			resulting_polyline.push_back((subdivision_polyline[j-1] + subdivision_polyline[j]) / 2.0f); 
+
+			resulting_polyline.push_back(
+				(3.0f * subdivision_polyline[j] + ((subdivision_polyline[j - 1] + subdivision_polyline[j + 1]) / 2.0f)) / 4.0f
+			);
+		}
+
+		resulting_polyline.push_back((subdivision_polyline[size-2] + subdivision_polyline[size-1]) / 2.0f);
+		resulting_polyline.push_back(subdivision_polyline[size - 1]);
+
+		subdivision_polyline = std::move(resulting_polyline);
+	}
+
+	return PAGSubdivisionProfile(subdivision_polyline);
 }
 
 PAGSubdivisionProfile::ValidityReport PAGSubdivisionProfile::status()
