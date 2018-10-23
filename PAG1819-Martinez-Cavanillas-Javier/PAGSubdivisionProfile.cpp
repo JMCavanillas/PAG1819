@@ -2,6 +2,10 @@
 
 #include <gtc/constants.hpp>
 
+/**
+ * Realiza varios test de validez sobre la linea de perfil, corrije los errores subsanables y devuelve una estructura de tipo
+ * ValidyReport que contiene información del estado de la linea y los resultados de los tests realizados
+ */
 PAGSubdivisionProfile::ValidityReport PAGSubdivisionProfile::validation_test(std::vector<glm::vec2>& points)
 {
 	ValidityReport validity;
@@ -66,11 +70,17 @@ PAGSubdivisionProfile::ValidityReport PAGSubdivisionProfile::validation_test(std
 	return validity;
 }
 
+/**
+ * Constructor por defecto
+ */
 PAGSubdivisionProfile::PAGSubdivisionProfile()
 {
 
 }
 
+/**
+ * Constructor a partir de unos puntos
+ */
 PAGSubdivisionProfile::PAGSubdivisionProfile(std::vector<glm::vec2> points)
 	: points_(points)
 {
@@ -81,6 +91,9 @@ PAGSubdivisionProfile::PAGSubdivisionProfile(std::vector<glm::vec2> points)
 
 }
 
+/**
+ * Devuelve una nueva instancia de la clase con su perfil subdividido [times] veces
+ */
 PAGSubdivisionProfile PAGSubdivisionProfile::subdivide(unsigned times)
 {
 	if (validityStatus_.status == PAGSubdivisionProfile::INVALID)
@@ -115,16 +128,25 @@ PAGSubdivisionProfile PAGSubdivisionProfile::subdivide(unsigned times)
 	return PAGSubdivisionProfile(subdivision_polyline);
 }
 
+/**
+ * Devuelve una estructura de tipo ValidityReport informando del estado y situación de los test de validez realizados
+ */
 PAGSubdivisionProfile::ValidityReport PAGSubdivisionProfile::status()
 {
 	return this->validityStatus_;
 }
 
+/**
+ * Devuelve si el perfil es valido o no
+ */
 bool PAGSubdivisionProfile::isValid()
 {
 	return !(validityStatus_.status == PAGSubdivisionProfile::INVALID);
 }
 
+/**
+ * Devuelve si el perfil genera la parte especificada (tapa_abajo, cuerpo, tapa_arriba)
+ */
 bool PAGSubdivisionProfile::has(PAGProfileParts part)
 {
 	if (validityStatus_.status == PAGSubdivisionProfile::INVALID)
@@ -139,6 +161,9 @@ bool PAGSubdivisionProfile::has(PAGProfileParts part)
 		return true;
 }
 
+/**
+ * Devuelve el conjunto de puntos del perfil como referencia constante (solo lectura)
+ */
 const std::vector<glm::vec2>& PAGSubdivisionProfile::getPoints()
 {
 	return points_;

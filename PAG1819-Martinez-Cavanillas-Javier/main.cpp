@@ -123,6 +123,7 @@ int main() {
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 
+	// Realizamos configuraciones iniciales de la escena
 	PAGRenderer::getInstance()->prepareOpenGL();
 
 	// - Ciclo de eventos de la aplicación. La condición de parada es que la

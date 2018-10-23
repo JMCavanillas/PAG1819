@@ -5,6 +5,9 @@
 
 const double PI = 3.14159265358979323846;
 
+/**
+ * Constructor de la clase, genera el objeto de revolución indicado
+ */
 PAGRevolutionObject::PAGRevolutionObject(std::vector<glm::vec2> points, unsigned subdivisions, unsigned slices)
 {
 	initialProfile_ = PAGSubdivisionProfile(points);
@@ -105,6 +108,9 @@ PAGRevolutionObject::PAGRevolutionObject(std::vector<glm::vec2> points, unsigned
 
 }
 
+/**
+ * Destructor de la clase, libera la memoria alojada
+ */
 PAGRevolutionObject::~PAGRevolutionObject()
 {
 	for (unsigned i = 0; i < 3; ++i)
@@ -118,6 +124,9 @@ PAGRevolutionObject::~PAGRevolutionObject()
 	}
 }
 
+/**
+ * Exporta puntos y normales a un archivo de texto (Por motivos de depuración)
+ */
 void PAGRevolutionObject::exportPosNorm(PAGRevObjParts part)
 {
 	std::ofstream file("myfile.txt");
@@ -143,6 +152,9 @@ void PAGRevolutionObject::exportPosNorm(PAGRevObjParts part)
 		
 }
 
+/**
+ * Devuelve un conjunto con los puntos (o normales) indicados revolucionados de acuerdo al atributo slices_
+ */
 std::vector<glm::vec3> PAGRevolutionObject::revolution(const std::vector<glm::vec2>& points, unsigned start, unsigned end)
 {
 	
@@ -168,6 +180,9 @@ std::vector<glm::vec3> PAGRevolutionObject::revolution(const std::vector<glm::ve
 	return result_points;
 }
 
+/**
+ * Devuelve las tangentes de un nivel del puntos
+ */
 std::vector<glm::vec3> PAGRevolutionObject::calcTangents()
 {
 	double delta = 2 * PI / slices_;
@@ -185,6 +200,10 @@ std::vector<glm::vec3> PAGRevolutionObject::calcTangents()
 	return result_points;
 }
 
+
+/**
+ * Calcula los indices indicando la topología para el cuerpo del objeto de revolución
+ */
 std::vector<GLuint> PAGRevolutionObject::calcTriangleStripIndices(unsigned points, unsigned slices)
 {
 	std::vector<GLuint> indices;
@@ -200,6 +219,9 @@ std::vector<GLuint> PAGRevolutionObject::calcTriangleStripIndices(unsigned point
 	return indices;
 }
 
+/**
+ * Calcula las normales de una linea generatriz
+ */
 std::vector<glm::vec2> PAGRevolutionObject::calcNormals(const std::vector<glm::vec2>& points, unsigned start, unsigned end)
 {
 	if (end > points.size() || start > points.size())
@@ -233,6 +255,9 @@ std::vector<glm::vec2> PAGRevolutionObject::calcNormals(const std::vector<glm::v
 	return result;
 }
 
+/**
+ * Calcula las coordenadas de textura para el cuerpo de un objeto de revolución
+ */
 std::vector<glm::vec2> PAGRevolutionObject::calcTextureCoords(const std::vector<glm::vec2>& points, unsigned start, unsigned end)
 {
 	if (end > points.size() || start > points.size())
@@ -256,6 +281,9 @@ std::vector<glm::vec2> PAGRevolutionObject::calcTextureCoords(const std::vector<
 	return textureCoords;
 }
 
+/**
+ * Calcula las coordenadas de textura para las tapas de un objeto de revolución
+ */
 std::vector<glm::vec2> PAGRevolutionObject::calcTextureCoords()
 {
 	double delta = 2 * PI / slices_;
@@ -272,16 +300,25 @@ std::vector<glm::vec2> PAGRevolutionObject::calcTextureCoords()
 	return textureCoords;
 }
 
+/**
+ * Devuelve si un objeto tiene un perfil válido
+ */
 bool PAGRevolutionObject::isValid()
 {
 	return initialProfile_.isValid();
 }
 
+/**
+ * Devuelve si un objeto tiene la parte especificada
+ */
 bool PAGRevolutionObject::has(PAGRevObjParts part)
 {
 	return posAndNorm_[part];
 }
 
+/**
+ * Devuelve las posiciones y las normales de la parte especificada
+ */
 std::vector<PAGPosNorm> PAGRevolutionObject::getPositionsAndNormals(PAGRevObjParts part)
 {
 	if (posAndNorm_[part])
@@ -290,6 +327,9 @@ std::vector<PAGPosNorm> PAGRevolutionObject::getPositionsAndNormals(PAGRevObjPar
 	return std::vector<PAGPosNorm>();
 }
 
+/**
+ * Devuelve las coordenadas de textura de la parte especificada
+ */
 std::vector<glm::vec2> PAGRevolutionObject::getTextureCoords(PAGRevObjParts part)
 {
 	if (textureCoords_[part])
@@ -298,6 +338,9 @@ std::vector<glm::vec2> PAGRevolutionObject::getTextureCoords(PAGRevObjParts part
 	return std::vector<glm::vec2>();
 }
 
+/**
+ * Devuelve las tangentes de la parte especificada
+ */
 std::vector<glm::vec3> PAGRevolutionObject::getTangents(PAGRevObjParts part)
 {
 	if (tangents_[part])
@@ -306,6 +349,9 @@ std::vector<glm::vec3> PAGRevolutionObject::getTangents(PAGRevObjParts part)
 	return std::vector<glm::vec3>();
 }
 
+/**
+ * Devuelve los indices indicando la topologia para nube de puntos
+ */
 std::vector<GLuint> PAGRevolutionObject::getIndices4PointCloud(PAGRevObjParts part)
 {
 	if (posAndNorm_[part])
@@ -320,6 +366,9 @@ std::vector<GLuint> PAGRevolutionObject::getIndices4PointCloud(PAGRevObjParts pa
 	return std::vector<GLuint>();
 }
 
+/**
+ * Devuelve los indices indicando la topologia para malla de triangulos
+ */
 std::vector<GLuint> PAGRevolutionObject::getIndices4TriangleMesh(PAGRevObjParts part)
 {
 	if (!posAndNorm_[part])
@@ -339,6 +388,9 @@ std::vector<GLuint> PAGRevolutionObject::getIndices4TriangleMesh(PAGRevObjParts 
 		return calcTriangleStripIndices(posAndNorm_[part]->size() / (slices_ + 1), slices_);
 }
 
+/**
+ * Devuelve el numero de puntos totales de la parte especificada
+ */
 unsigned PAGRevolutionObject::getNPoints(PAGRevObjParts part)
 {
 	if (posAndNorm_[part])

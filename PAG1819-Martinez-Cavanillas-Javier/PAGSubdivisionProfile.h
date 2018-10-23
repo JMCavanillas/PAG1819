@@ -6,7 +6,7 @@
 
 class PAGSubdivisionProfile
 {
-	// Estructuras para comunicar el estado de la linea generatriz
+	// Estructuras para comunicar el estado del perfil
 	enum ValidityStatus
 	{
 		GOOD = 0,
@@ -14,6 +14,10 @@ class PAGSubdivisionProfile
 		INVALID = 2
 	};
 
+	/**
+	 * Estructura que contiene el estado del perfil y un booleano indicando si ha
+	 * pasado o no cada test realizado
+	 */
 	struct ValidityReport
 	{
 		ValidityStatus status;
