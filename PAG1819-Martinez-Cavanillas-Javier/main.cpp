@@ -14,7 +14,6 @@ extern "C" {
 // - Esta función callback será llamada cada vez que el área de dibujo
 // OpenGL deba ser redibujada.
 void window_refresh_callback(GLFWwindow *window) {
-	PAGRenderer::getInstance()->prepareOpenGL();
 	PAGRenderer::getInstance()->refresh();
 	// - GLFW usa un doble buffer para que no haya parpadeo. Esta orden
 	// intercambia el buffer back (que se ha estado dibujando) por el
@@ -124,12 +123,8 @@ int main() {
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 
-	// - Establecemos un gris medio como color con el que se borrará el frame buffer.
-	// No tiene por qué ejecutarse en cada paso por el ciclo de eventos.
-	glClearColor(0.6, 0.6, 0.6, 1.0);
-	// - Le decimos a OpenGL que tenga en cuenta la profundidad a la hora de dibujar.
-	// No tiene por qué ejecutarse en cada paso por el ciclo de eventos.
-	glEnable(GL_DEPTH_TEST);
+	PAGRenderer::getInstance()->prepareOpenGL();
+
 	// - Ciclo de eventos de la aplicación. La condición de parada es que la
 	// ventana principal deba cerrarse, por ejemplo, si el usuario pulsa el
 	// botón de cerrar la ventana (la X).
