@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <glm.hpp>
+#include "PAGEnumeration.h"
 
 class PAGSubdivisionProfile
 {
@@ -30,13 +31,20 @@ class PAGSubdivisionProfile
 		std::vector<glm::vec2> points_;
 		ValidityReport validityStatus_;
 
+		bool hasTopLid_;
+		bool hasBottomLid_;
+
 	public:
-		PAGSubdivisionProfile( std::vector<glm::vec2> points);
+		PAGSubdivisionProfile();
+		PAGSubdivisionProfile(std::vector<glm::vec2> points);
 	
 		PAGSubdivisionProfile subdivide(unsigned times);
 
 		ValidityReport status();
 		bool isValid();
+
+		bool has(PAGProfileParts part);
+		const std::vector<glm::vec2>& getPoints();
 
 		virtual ~PAGSubdivisionProfile();
 };

@@ -125,11 +125,13 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PAGRenderer.cpp" />
+    <ClCompile Include="PAGRevolutionObject.cpp" />
     <ClCompile Include="PAGSubdivisionProfile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PAGEnumeration.h" />
     <ClInclude Include="PAGRenderer.h" />
+    <ClInclude Include="PAGRevolutionObject.h" />
     <ClInclude Include="PAGStructures.h" />
     <ClInclude Include="PAGSubdivisionProfile.h" />
   </ItemGroup>

@@ -13,6 +13,7 @@ class PAGRenderer
 
 		void refresh();
 		void change_viewport_size(int width, int height);
+		void prepareOpenGL();
 
 		// Métodos provisionales para probar los callbacks - muestran solo información por consola
 		void button_clicked(int button);

@@ -1,4 +1,6 @@
 #include "PAGRenderer.h"
+#include "PAGRevolutionObject.h"
+#include "PAGSubdivisionProfile.h"
 
 PAGRenderer* PAGRenderer::instance_ = nullptr;
 
@@ -24,6 +26,16 @@ void PAGRenderer::refresh()
 void PAGRenderer::change_viewport_size(int width, int height)
 {
 	glViewport(0, 0, width, height);
+}
+
+void PAGRenderer::prepareOpenGL()
+{
+	std::vector<glm::vec2> points = {glm::vec2(0, 0), glm::vec2(10, 1), glm::vec2(10, 3), glm::vec2(2, 4), glm::vec2(0, 6) };
+
+	PAGRevolutionObject holo(points, 2, 9);
+	holo.exportPosNorm(PAGRevObjParts::PAG_BODY);
+
+
 }
 
 void PAGRenderer::button_clicked(int button)

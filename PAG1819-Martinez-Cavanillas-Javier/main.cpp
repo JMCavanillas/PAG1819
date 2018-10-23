@@ -14,6 +14,7 @@ extern "C" {
 // - Esta función callback será llamada cada vez que el área de dibujo
 // OpenGL deba ser redibujada.
 void window_refresh_callback(GLFWwindow *window) {
+	PAGRenderer::getInstance()->prepareOpenGL();
 	PAGRenderer::getInstance()->refresh();
 	// - GLFW usa un doble buffer para que no haya parpadeo. Esta orden
 	// intercambia el buffer back (que se ha estado dibujando) por el
