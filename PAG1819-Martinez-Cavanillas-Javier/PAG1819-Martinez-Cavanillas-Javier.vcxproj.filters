@@ -27,6 +27,12 @@
     <ClCompile Include="PAGRevolutionObject.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
+    <ClCompile Include="PAGShaderProgram.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="PAGVao.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PAGRenderer.h">
@@ -44,5 +50,49 @@
     <ClInclude Include="PAGRevolutionObject.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="PAGShaderProgram.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="PAGVao.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="pointShader-vert.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="pointShader-frag.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="lineShader-frag.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="lineShader-vert.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="triangleFaceShader-vert.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="triangleFaceShader-frag.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="normalsAsColor-vert.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="normalsAsColor-frag.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="tangentsAsColor-vert.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="tangentsAsColor-frag.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="textCoordsAsColors-frag.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="textCoordsAsColors-vert.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
   </ItemGroup>
 </Project>

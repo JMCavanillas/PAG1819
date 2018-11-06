@@ -5,6 +5,7 @@
 #include <GLFW\glfw3.h>
 #include <Windows.h>
 #include "PAGRenderer.h"
+#include "PAGEnumeration.h"
 
 extern "C" {
 	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
@@ -45,7 +46,36 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_SLASH && action == GLFW_PRESS)
 		PAGRenderer::getInstance()->zoom(-3);
 
-	std::cout << "Key callback called, Key " << key << std::endl;
+	if (key == GLFW_KEY_N && action == GLFW_PRESS)
+	{
+		PAGRenderer::getInstance()->nextView();
+		PAGRenderer::getInstance()->refresh();
+	}
+	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
+	{
+		PAGRenderer::getInstance()->setCamera(0);
+		PAGRenderer::getInstance()->refresh();
+	}
+	if (key == GLFW_KEY_2 && action == GLFW_PRESS)
+	{
+		PAGRenderer::getInstance()->setCamera(1);
+		PAGRenderer::getInstance()->refresh();
+	}
+	if (key == GLFW_KEY_P && action == GLFW_PRESS)
+	{
+		PAGRenderer::getInstance()->setView(PAGDrawingMode::PAG_POINT_VIEW);
+		PAGRenderer::getInstance()->refresh();
+	}
+	if (key == GLFW_KEY_W && action == GLFW_PRESS)
+	{
+		PAGRenderer::getInstance()->setView(PAGDrawingMode::PAG_LINE_VIEW);
+		PAGRenderer::getInstance()->refresh();
+	}
+	if (key == GLFW_KEY_A && action == GLFW_PRESS)
+	{
+		PAGRenderer::getInstance()->setView(PAGDrawingMode::PAG_POINT_LINE_TRIANGLE_VIEW);
+		PAGRenderer::getInstance()->refresh();
+	}
 }
 
 // - Esta función callback será llamada cada vez que se pulse algún botón
@@ -130,8 +160,6 @@ int main() {
 	// ventana principal deba cerrarse, por ejemplo, si el usuario pulsa el
 	// botón de cerrar la ventana (la X).
 	while (!glfwWindowShouldClose(window)) {
-		// - Borrar los buffers (color y profundidad)
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// - GLFW usa un doble buffer para que no haya parpadeo. Esta orden
 		// intercambia el buffer back (que se ha estado dibujando) por el
 		// que se mostraba hasta ahora front.

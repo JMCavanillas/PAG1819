@@ -18,6 +18,7 @@ PAGRevolutionObject::PAGRevolutionObject(std::vector<glm::vec2> points, unsigned
 
 	for (unsigned i = 0; i < 3; ++i)
 	{
+		VAOs_[i] = nullptr;
 		posAndNorm_[i] = nullptr;
 		tangents_[i] = nullptr;
 		textureCoords_[i] = nullptr;
@@ -58,6 +59,9 @@ PAGRevolutionObject::PAGRevolutionObject(std::vector<glm::vec2> points, unsigned
 		posAndNorm_[PAGRevObjParts::PAG_BODY]->push_back(element);
 		tangents_[PAGRevObjParts::PAG_BODY]->push_back(body_tangents[i % body_tangents.size()]);
 	}
+
+	VAOs_[PAGRevObjParts::PAG_BODY] = new PAGVao(*posAndNorm_[PAGRevObjParts::PAG_BODY],
+		*tangents_[PAGRevObjParts::PAG_BODY], *textureCoords_[PAGRevObjParts::PAG_BODY]);
 	
 	// Tratamiento de tapas
 	if (bottom_lid)
@@ -80,6 +84,9 @@ PAGRevolutionObject::PAGRevolutionObject(std::vector<glm::vec2> points, unsigned
 			posAndNorm_[PAGRevObjParts::PAG_BOTTOM_FAN]->push_back(vertex);
 			tangents_[PAGRevObjParts::PAG_BOTTOM_FAN]->push_back(glm::cross(vertex.normal, z_positive));
 		}
+
+		VAOs_[PAGRevObjParts::PAG_BOTTOM_FAN] = new PAGVao(*posAndNorm_[PAGRevObjParts::PAG_BOTTOM_FAN],
+			*tangents_[PAGRevObjParts::PAG_BOTTOM_FAN], *textureCoords_[PAGRevObjParts::PAG_BOTTOM_FAN]);
 	}
 
 	if (top_lid)
@@ -104,8 +111,89 @@ PAGRevolutionObject::PAGRevolutionObject(std::vector<glm::vec2> points, unsigned
 			posAndNorm_[PAGRevObjParts::PAG_TOP_FAN]->push_back(vertex);
 			tangents_[PAGRevObjParts::PAG_TOP_FAN]->push_back(glm::cross(vertex.normal, z_positive));
 		}
+
+		VAOs_[PAGRevObjParts::PAG_TOP_FAN] = new PAGVao(*posAndNorm_[PAGRevObjParts::PAG_TOP_FAN],
+			*tangents_[PAGRevObjParts::PAG_TOP_FAN], *textureCoords_[PAGRevObjParts::PAG_TOP_FAN]);
 	}
 
+	// Añadimos la topologia
+	// PUNTOS
+	for (unsigned p = 0; p < 3; ++p) 
+		if (VAOs_[p])
+		{
+			std::vector<GLuint> indices;
+			indices.reserve(posAndNorm_[p]->size());
+			for (unsigned i = 0; i < posAndNorm_[p]->size(); ++i)
+				indices.push_back(i);
+
+			VAOs_[p]->addIBO(indices, GL_POINTS);
+		}
+
+	// TIRA DE LINEAS
+	for (unsigned p = 0; p < 3; ++p)
+		if (VAOs_[p])
+		{
+			if (p == PAGRevObjParts::PAG_BODY)
+			{
+				std::vector<GLuint> indices = calcLineStripIndices(posAndNorm_[PAGRevObjParts::PAG_BODY]->size() / (slices_ + 1), slices_);
+				VAOs_[p]->addIBO(indices, GL_LINE_STRIP);
+			} 
+			else {
+				std::vector<GLuint> indices;
+				for (unsigned i = 2; i < posAndNorm_[p]->size(); ++i)
+				{
+					indices.push_back(0);
+					indices.push_back(i);
+					indices.push_back(i - 1);
+					indices.push_back(0xFFFFFFF);
+				}
+
+				VAOs_[p]->addIBO(indices, GL_LINE_STRIP);
+			}
+		}
+
+	// TIRA DE TRIANGULOS
+	for (unsigned p = 0; p < 3; ++p)
+		if (VAOs_[p])
+		{
+			if (p == PAGRevObjParts::PAG_BODY)
+			{
+				std::vector<GLuint> indices = calcTriangleStripIndices(posAndNorm_[PAGRevObjParts::PAG_BODY]->size() / (slices_ + 1), slices_);
+				VAOs_[p]->addIBO(indices, GL_TRIANGLE_STRIP);
+			}
+			else {
+				std::vector<GLuint> indices;
+				for (unsigned i = 0; i < posAndNorm_[p]->size(); ++i)
+					indices.push_back(i);
+
+				VAOs_[p]->addIBO(indices, GL_TRIANGLE_FAN);
+			}
+		}
+}
+
+PAGRevolutionObject::PAGRevolutionObject(const PAGRevolutionObject & orig)
+{
+	initialProfile_ = orig.initialProfile_;
+	refinedProfile_ = orig.refinedProfile_;
+	subdivisions_ = orig.subdivisions_;
+	slices_ = orig.slices_;
+
+	for (unsigned i = 0; i < 3; ++i)
+	{
+		VAOs_[i] = nullptr;
+		posAndNorm_[i] = nullptr;
+		tangents_[i] = nullptr;
+		textureCoords_[i] = nullptr;
+		if (orig.VAOs_[i])
+			VAOs_[i] = new PAGVao(*orig.VAOs_[i]);
+		if (orig.posAndNorm_[i])
+			posAndNorm_[i] = new std::vector<PAGPosNorm>(*orig.posAndNorm_[i]);
+		if (orig.tangents_[i])
+			tangents_[i] = new std::vector<glm::vec3>(*orig.tangents_[i]);
+		if (orig.textureCoords_[i])
+			textureCoords_[i] = new std::vector<glm::vec2>(*orig.textureCoords_[i]);
+
+	}
 }
 
 /**
@@ -115,6 +203,8 @@ PAGRevolutionObject::~PAGRevolutionObject()
 {
 	for (unsigned i = 0; i < 3; ++i)
 	{
+		if (VAOs_[i])
+			delete VAOs_[i];
 		if (posAndNorm_[i])
 			delete posAndNorm_[i];
 		if (tangents_[i])
@@ -152,6 +242,39 @@ void PAGRevolutionObject::exportPosNorm(PAGRevObjParts part)
 		
 }
 
+void PAGRevolutionObject::drawAsPoints()
+{
+	for (unsigned p = 0; p < 3; ++p)
+		if (VAOs_[p])
+			VAOs_[p]->draw(GL_POINTS, GL_POINTS);
+}
+
+void PAGRevolutionObject::drawAsLines()
+{
+	for (unsigned p = 0; p < 3; ++p)
+		if (VAOs_[p])
+		{
+			glEnable(GL_PRIMITIVE_RESTART);
+			glPrimitiveRestartIndex(0xFFFFFFF);
+			VAOs_[p]->draw(GL_LINE_STRIP, GL_LINE_STRIP);
+		}
+}
+
+void PAGRevolutionObject::drawAsTriangles()
+{
+	for (unsigned p = 0; p < 3; ++p)
+		if (VAOs_[p])
+		{
+			glEnable(GL_PRIMITIVE_RESTART);
+			glPrimitiveRestartIndex(0xFFFFFFF);
+
+			if (p == PAGRevObjParts::PAG_BODY)
+				VAOs_[p]->draw(GL_TRIANGLE_STRIP, GL_TRIANGLE_STRIP);
+			else 
+				VAOs_[p]->draw(GL_TRIANGLE_FAN, GL_TRIANGLE_FAN);
+		}
+}
+
 /**
  * Devuelve un conjunto con los puntos (o normales) indicados revolucionados de acuerdo al atributo slices_
  */
@@ -171,7 +294,7 @@ std::vector<glm::vec3> PAGRevolutionObject::revolution(const std::vector<glm::ve
 		for (unsigned s = 0; s <= slices_; ++s)
 		{
 			float alpha = s * delta;
-			glm::vec3 r_point (points[i].x * cos(s*delta), points[i].y, -1 * points[i].x * sin(s*delta)); 
+			glm::vec3 r_point (points[i].x * cos(alpha), points[i].y, -1 * points[i].x * sin(alpha)); 
 
 			result_points.push_back(r_point);
 		}
@@ -203,6 +326,7 @@ std::vector<glm::vec3> PAGRevolutionObject::calcTangents()
 
 /**
  * Calcula los indices indicando la topología para el cuerpo del objeto de revolución
+ * points = Numero de puntos del cuerpo
  */
 std::vector<GLuint> PAGRevolutionObject::calcTriangleStripIndices(unsigned points, unsigned slices)
 {
@@ -214,7 +338,27 @@ std::vector<GLuint> PAGRevolutionObject::calcTriangleStripIndices(unsigned point
 			indices.push_back(i*(slices + 1) + s);
 			indices.push_back(i*(slices + 1) + (s + 1));
 		}
-		indices.push_back(0xFFFF);
+		indices.push_back(0xFFFFFFF);
+	}
+	return indices;
+}
+
+std::vector<GLuint> PAGRevolutionObject::calcLineStripIndices(unsigned points, unsigned slices)
+{
+	std::vector<GLuint> indices;
+	for (unsigned i = 0; i < points; ++i)
+	{
+		for (unsigned s = 0; s <= slices; ++s)
+			indices.push_back(i*(slices + 1) + s);
+		indices.push_back(0xFFFFFFF);
+	}
+
+	for (unsigned s = 0; s <= slices; ++s)
+	{
+		for (unsigned i = 0; i < points; ++i)
+			indices.push_back(i*(slices + 1) + s);
+
+		indices.push_back(0xFFFFFFF);
 	}
 	return indices;
 }
@@ -276,7 +420,7 @@ std::vector<glm::vec2> PAGRevolutionObject::calcTextureCoords(const std::vector<
 	std::vector<glm::vec2> textureCoords;
 	for (unsigned i = 0; i < end - start; ++i)
 		for (unsigned j = 0; j <= slices_; ++j)
-			textureCoords.push_back(glm::vec2(j / slices_, lengths[i]/lengths.back() ));
+			textureCoords.push_back(glm::vec2(float(j) / slices_, lengths[i]/lengths.back() ));
 
 	return textureCoords;
 }
@@ -294,7 +438,7 @@ std::vector<glm::vec2> PAGRevolutionObject::calcTextureCoords()
 	// Primer Elemento de la tapa
 	textureCoords.push_back(glm::vec2(0.5, 0.5));
 
-	for (unsigned s = 0; s < slices_; ++s)
+	for (unsigned s = 0; s <= slices_; ++s)
 		textureCoords.push_back(glm::vec2((cos(s*delta) / 2.0f + 0.5f), (sin(s*delta) / 2.0f) + 0.5f));
 
 	return textureCoords;
@@ -314,78 +458,6 @@ bool PAGRevolutionObject::isValid()
 bool PAGRevolutionObject::has(PAGRevObjParts part)
 {
 	return posAndNorm_[part];
-}
-
-/**
- * Devuelve las posiciones y las normales de la parte especificada
- */
-std::vector<PAGPosNorm> PAGRevolutionObject::getPositionsAndNormals(PAGRevObjParts part)
-{
-	if (posAndNorm_[part])
-		return *posAndNorm_[part];
-
-	return std::vector<PAGPosNorm>();
-}
-
-/**
- * Devuelve las coordenadas de textura de la parte especificada
- */
-std::vector<glm::vec2> PAGRevolutionObject::getTextureCoords(PAGRevObjParts part)
-{
-	if (textureCoords_[part])
-		return *textureCoords_[part];
-
-	return std::vector<glm::vec2>();
-}
-
-/**
- * Devuelve las tangentes de la parte especificada
- */
-std::vector<glm::vec3> PAGRevolutionObject::getTangents(PAGRevObjParts part)
-{
-	if (tangents_[part])
-		return *tangents_[part];
-
-	return std::vector<glm::vec3>();
-}
-
-/**
- * Devuelve los indices indicando la topologia para nube de puntos
- */
-std::vector<GLuint> PAGRevolutionObject::getIndices4PointCloud(PAGRevObjParts part)
-{
-	if (posAndNorm_[part])
-	{
-		std::vector<GLuint> indices;
-		indices.reserve(posAndNorm_[part]->size());
-		for (unsigned i = 0; i < posAndNorm_[part]->size(); ++i)
-			indices.push_back(i);
-		return indices;
-	}
-
-	return std::vector<GLuint>();
-}
-
-/**
- * Devuelve los indices indicando la topologia para malla de triangulos
- */
-std::vector<GLuint> PAGRevolutionObject::getIndices4TriangleMesh(PAGRevObjParts part)
-{
-	if (!posAndNorm_[part])
-		return std::vector<GLuint>();
-
-	std::vector<GLuint> indices;
-	indices.reserve(posAndNorm_[part]->size());
-
-	if (part == PAGRevObjParts::PAG_BOTTOM_FAN || part == PAGRevObjParts::PAG_TOP_FAN)
-	{	
-		for (unsigned i = 0; i < posAndNorm_[part]->size(); ++i)
-			indices.push_back(i);
-		return indices;
-	}
-
-	if (part == PAGRevObjParts::PAG_BODY)
-		return calcTriangleStripIndices(posAndNorm_[part]->size() / (slices_ + 1), slices_);
 }
 
 /**

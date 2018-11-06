@@ -6,6 +6,7 @@
 #include "PAGSubdivisionProfile.h"
 #include "PAGEnumeration.h"
 #include "PAGStructures.h"
+#include "PAGVao.h"
 
 class PAGRevolutionObject
 {
@@ -18,6 +19,7 @@ class PAGRevolutionObject
 		std::vector<glm::vec3> calcTangents();
 
 		std::vector<GLuint> calcTriangleStripIndices(unsigned points, unsigned slices);
+		std::vector<GLuint> calcLineStripIndices(unsigned points, unsigned slices);
 
 		PAGSubdivisionProfile initialProfile_;
 		PAGSubdivisionProfile refinedProfile_;
@@ -29,22 +31,22 @@ class PAGRevolutionObject
 		std::vector<glm::vec3>*  tangents_[3];
 		std::vector<glm::vec2>*  textureCoords_[3];
 
+		PAGVao* VAOs_[3];
+
 	public:
 		PAGRevolutionObject(std::vector<glm::vec2> points, unsigned subdivisions, unsigned slices);
+		PAGRevolutionObject(const PAGRevolutionObject& orig);
 
 		bool isValid();
 		bool has(PAGRevObjParts part);
 
-		std::vector<PAGPosNorm> getPositionsAndNormals(PAGRevObjParts part);
-		std::vector<glm::vec2> getTextureCoords(PAGRevObjParts part);
-		std::vector<glm::vec3> getTangents(PAGRevObjParts part);
-
-		std::vector<GLuint> getIndices4PointCloud(PAGRevObjParts part);
-		std::vector<GLuint> getIndices4TriangleMesh(PAGRevObjParts part);
-
 		unsigned getNPoints(PAGRevObjParts part);
 
 		void exportPosNorm(PAGRevObjParts part);
+
+		void drawAsPoints();
+		void drawAsLines();
+		void drawAsTriangles();
 
 		virtual ~PAGRevolutionObject();
 };

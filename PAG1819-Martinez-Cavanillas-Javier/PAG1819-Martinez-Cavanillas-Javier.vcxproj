@@ -126,14 +126,32 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PAGRenderer.cpp" />
     <ClCompile Include="PAGRevolutionObject.cpp" />
+    <ClCompile Include="PAGShaderProgram.cpp" />
     <ClCompile Include="PAGSubdivisionProfile.cpp" />
+    <ClCompile Include="PAGVao.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PAGEnumeration.h" />
     <ClInclude Include="PAGRenderer.h" />
     <ClInclude Include="PAGRevolutionObject.h" />
+    <ClInclude Include="PAGShaderProgram.h" />
     <ClInclude Include="PAGStructures.h" />
     <ClInclude Include="PAGSubdivisionProfile.h" />
+    <ClInclude Include="PAGVao.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="lineShader-frag.glsl" />
+    <None Include="lineShader-vert.glsl" />
+    <None Include="normalsAsColor-frag.glsl" />
+    <None Include="normalsAsColor-vert.glsl" />
+    <None Include="pointShader-frag.glsl" />
+    <None Include="pointShader-vert.glsl" />
+    <None Include="tangentsAsColor-frag.glsl" />
+    <None Include="tangentsAsColor-vert.glsl" />
+    <None Include="textCoordsAsColors-frag.glsl" />
+    <None Include="textCoordsAsColors-vert.glsl" />
+    <None Include="triangleFaceShader-frag.glsl" />
+    <None Include="triangleFaceShader-vert.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
