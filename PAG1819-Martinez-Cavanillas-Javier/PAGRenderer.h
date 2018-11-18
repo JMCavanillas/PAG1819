@@ -23,7 +23,11 @@ class PAGRenderer
 	void tangentsAsColorShaderConfig(const glm::mat4& view_matrix);
 	PAGShaderProgram textCoordsAsColorShader_;
 	void textCoordsAsColorsShaderConfig(const glm::mat4& view_matrix);
+	PAGShaderProgram magicShader_;
+	void magicShaderConfig(const glm::mat4& view_matrix);
 
+	int viewport_height;
+	int viewport_width;
 
 	std::vector<glm::mat4> cameras_;
 	unsigned currentCamera_;

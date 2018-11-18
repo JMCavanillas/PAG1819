@@ -17,20 +17,25 @@ PAGRenderer* PAGRenderer::getInstance()
 
 PAGRenderer::PAGRenderer()
 {
+	viewport_width = 1;
+	viewport_height = 1;
 }
 
 void PAGRenderer::refresh()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glm::mat4 m = glm::perspective(glm::radians(20.0f), 16.0f / 9.0f, 5.0f, 500.0f) * cameras_[currentCamera_];
+	glm::mat4 m = glm::perspective(glm::radians(20.0f), float(viewport_width) / float(viewport_height), 1.0f, 300.0f) * cameras_[currentCamera_];
 
 	switch (currentView_)
 	{
 	case PAG_POINT_VIEW:
+		glDepthMask(GL_FALSE);
 		pointShaderConfig(7.0f, glm::vec3(74.0f / 255.0f, 208.0f / 255.0f, 232.0f / 255.0f), m);
 		for (PAGRevolutionObject object : sceneObjects_)
 			object.drawAsPoints();
+
+		glDepthMask(GL_TRUE);
 		break;
 	case PAG_LINE_VIEW:
 		lineShaderConfig(glm::vec3(74.0f / 255.0f, 208.0f / 255.0f, 232.0f / 255.0f), m);
@@ -43,18 +48,21 @@ void PAGRenderer::refresh()
 			object.drawAsTriangles();
 		break;
 	case PAG_POINT_LINE_TRIANGLE_VIEW:
-		pointShaderConfig(7.0f, glm::vec3(74.0f / 255.0f, 208.0f / 255.0f, 232.0f / 255.0f), m);
-		for (PAGRevolutionObject object : sceneObjects_)
-			object.drawAsPoints();
-		lineShaderConfig(glm::vec3(74.0f / 255.0f, 208.0f / 255.0f, 232.0f / 255.0f), m);
+		lineShaderConfig(glm::vec3(55.0f / 255.0f, 125.0f / 255.0f, 185.0f / 255.0f), m);
 		for (PAGRevolutionObject object : sceneObjects_)
 			object.drawAsLines();
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0f, 1.0f);
-		lineShaderConfig(glm::vec3(101.0f / 255.0f, 101.0f / 255.0f, 120.0f / 255.0f), m);
+		triangleFaceShaderConfig(m);
 		for (PAGRevolutionObject object : sceneObjects_)
 			object.drawAsTriangles();
 		glDisable(GL_POLYGON_OFFSET_FILL);
+		glDepthMask(GL_FALSE);
+		pointShaderConfig(13.0f, glm::vec3(55.0f / 255.0f, 125.0f / 255.0f, 185.0f / 255.0f), m);
+		for (PAGRevolutionObject object : sceneObjects_)
+			object.drawAsPoints();
+
+		glDepthMask(GL_TRUE);
 		break;
 	case PAG_FRONT_FACE_VIEW:
 		triangleFaceShaderConfig(m);
@@ -76,6 +84,10 @@ void PAGRenderer::refresh()
 		for (PAGRevolutionObject object : sceneObjects_)
 			object.drawAsTriangles();
 		break;
+	case PAG_MAGIC_VIEW:
+		magicShaderConfig(m);
+		for (PAGRevolutionObject object : sceneObjects_)
+			object.drawAsTriangles();
 	default:
 		break;
 	}
@@ -87,6 +99,8 @@ void PAGRenderer::refresh()
 
 void PAGRenderer::change_viewport_size(int width, int height)
 {
+	viewport_height = height;
+	viewport_width = width;
 	glViewport(0, 0, width, height);
 }
 
@@ -100,6 +114,7 @@ void PAGRenderer::prepareOpenGL()
 	normalsAsColorShader_.createShaderProgram("normalsAsColor");
 	tangentsAsColorShader_.createShaderProgram("tangentsAsColor");
 	textCoordsAsColorShader_.createShaderProgram("textCoordsAsColors");
+	magicShader_.createShaderProgram("magicShader");
 
 	// - Establecemos un gris medio como color con el que se borrará el frame buffer.
 	// No tiene por qué ejecutarse en cada paso por el ciclo de eventos.
@@ -115,22 +130,19 @@ void PAGRenderer::prepareOpenGL()
 
 	// Generamos objetos de la escena
 	std::vector<glm::vec2> points = { glm::vec2(0, 0), glm::vec2(10, 1), glm::vec2(10, 3), glm::vec2(2, 4), glm::vec2(0, 6) };
-	auto hola = PAGRevolutionObject(points, 2, 20);
+	auto object_1 = PAGRevolutionObject(points, 3, 30);
 
-	sceneObjects_.push_back(hola);
+	sceneObjects_.push_back(object_1);
 
 	// Establecemos cámaras
 	currentCamera_ = 0;
-	cameras_.push_back(glm::lookAt(glm::vec3(0, 10, -35), glm::vec3(0, 3, 0), glm::vec3(0, 1, 0)));
+	cameras_.push_back(glm::lookAt(glm::vec3(0, 10, 35), glm::vec3(0, 3, 0), glm::vec3(0, 1, 0)));
 	cameras_.push_back(glm::lookAt(glm::vec3(0, 14, 0), glm::vec3(0, 0, 0), glm::vec3(1, 0, 0)));
 }
 
 void PAGRenderer::pointShaderConfig(float point_size, const glm::vec3& color, const glm::mat4& view_matrix)
 {
-	// -Activamos el shader program que se va a usar.
 	pointShader_.use();
-	// - Asignamos los parámetros de tipo uniform del shader program.
-	// Cada shader program tiene su propio conjunto de parámetros.
 	pointShader_.setUniform("pointSize", point_size);
 	pointShader_.setUniform("vColor", color);
 	pointShader_.setUniform("mModelViewProj", view_matrix);
@@ -138,53 +150,44 @@ void PAGRenderer::pointShaderConfig(float point_size, const glm::vec3& color, co
 
 void PAGRenderer::lineShaderConfig(const glm::vec3 & color, const glm::mat4 & view_matrix)
 {
-	// -Activamos el shader program que se va a usar.
 	lineShader_.use();
-	// - Asignamos los parámetros de tipo uniform del shader program.
-	// Cada shader program tiene su propio conjunto de parámetros.
 	lineShader_.setUniform("vColor", color);
 	lineShader_.setUniform("mModelViewProj", view_matrix);
 }
 
 void PAGRenderer::triangleFaceShaderConfig(const glm::mat4 & view_matrix)
 {
-	// -Activamos el shader program que se va a usar.
 	triangleFaceShader_.use();
-	// - Asignamos los parámetros de tipo uniform del shader program.
-	// Cada shader program tiene su propio conjunto de parámetros.
 	triangleFaceShader_.setUniform("mModelViewProj", view_matrix);
 }
 
 void PAGRenderer::normalsAsColorShaderConfig(const glm::mat4 & view_matrix)
 {
-	// -Activamos el shader program que se va a usar.
 	normalsAsColorShader_.use();
-	// - Asignamos los parámetros de tipo uniform del shader program.
-	// Cada shader program tiene su propio conjunto de parámetros.
 	normalsAsColorShader_.setUniform("mModelViewProj", view_matrix);
 }
 
 void PAGRenderer::tangentsAsColorShaderConfig(const glm::mat4 & view_matrix)
 {
-	// -Activamos el shader program que se va a usar.
 	tangentsAsColorShader_.use();
-	// - Asignamos los parámetros de tipo uniform del shader program.
-	// Cada shader program tiene su propio conjunto de parámetros.
 	tangentsAsColorShader_.setUniform("mModelViewProj", view_matrix);
 }
 
 void PAGRenderer::textCoordsAsColorsShaderConfig(const glm::mat4 & view_matrix)
 {
-	// -Activamos el shader program que se va a usar.
 	textCoordsAsColorShader_.use();
-	// - Asignamos los parámetros de tipo uniform del shader program.
-	// Cada shader program tiene su propio conjunto de parámetros.
 	textCoordsAsColorShader_.setUniform("mModelViewProj", view_matrix);
+}
+
+void PAGRenderer::magicShaderConfig(const glm::mat4 & view_matrix)
+{
+	magicShader_.use();
+	magicShader_.setUniform("mModelViewProj", view_matrix);
 }
 
 void PAGRenderer::nextView()
 {
-	currentView_ = (currentView_ + 1) % 8;
+	currentView_ = (currentView_ + 1) % 9;
 }
 
 void PAGRenderer::nextCamera()
@@ -199,7 +202,7 @@ void PAGRenderer::setCamera(unsigned n_camera)
 
 void PAGRenderer::setView(int view)
 {
-	currentView_ = view % 8;
+	currentView_ = view % 9;
 }
 
 

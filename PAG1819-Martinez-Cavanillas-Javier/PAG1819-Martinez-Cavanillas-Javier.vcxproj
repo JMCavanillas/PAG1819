@@ -142,6 +142,8 @@
   <ItemGroup>
     <None Include="lineShader-frag.glsl" />
     <None Include="lineShader-vert.glsl" />
+    <None Include="magicShader-frag.glsl" />
+    <None Include="magicShader-vert.glsl" />
     <None Include="normalsAsColor-frag.glsl" />
     <None Include="normalsAsColor-vert.glsl" />
     <None Include="pointShader-frag.glsl" />

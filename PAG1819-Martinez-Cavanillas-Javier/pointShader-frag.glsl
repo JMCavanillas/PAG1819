@@ -8,9 +8,11 @@ void main() {
 	if (length(coord) > 0.5)
 	{
 		discard;
+	} else if (length(coord) > 0.4) {
+		fColor = destinationColor;
+		fColor.a = (0.5 - length(coord)) / (0.5 - 0.4);
 	} else {
 		fColor = destinationColor;
-		fColor.a = 1 - length(coord) * length(coord) * 4;
 	}
 }
 	

@@ -94,5 +94,11 @@
     <None Include="textCoordsAsColors-vert.glsl">
       <Filter>Archivos de recursos</Filter>
     </None>
+    <None Include="magicShader-vert.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="magicShader-frag.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
   </ItemGroup>
 </Project>

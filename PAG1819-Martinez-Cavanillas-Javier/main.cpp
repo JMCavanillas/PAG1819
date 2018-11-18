@@ -71,6 +71,11 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 		PAGRenderer::getInstance()->setView(PAGDrawingMode::PAG_LINE_VIEW);
 		PAGRenderer::getInstance()->refresh();
 	}
+	if (key == GLFW_KEY_T && action == GLFW_PRESS)
+	{
+		PAGRenderer::getInstance()->setView(PAGDrawingMode::PAG_FRONT_FACE_VIEW);
+		PAGRenderer::getInstance()->refresh();
+	}
 	if (key == GLFW_KEY_A && action == GLFW_PRESS)
 	{
 		PAGRenderer::getInstance()->setView(PAGDrawingMode::PAG_POINT_LINE_TRIANGLE_VIEW);
@@ -155,6 +160,10 @@ int main() {
 
 	// Realizamos configuraciones iniciales de la escena
 	PAGRenderer::getInstance()->prepareOpenGL();
+	int width;
+	int height;
+	glfwGetWindowSize(window,&width, &height);
+	PAGRenderer::getInstance()->change_viewport_size(width, height);
 
 	// - Ciclo de eventos de la aplicación. La condición de parada es que la
 	// ventana principal deba cerrarse, por ejemplo, si el usuario pulsa el

@@ -145,7 +145,7 @@ PAGRevolutionObject::PAGRevolutionObject(std::vector<glm::vec2> points, unsigned
 					indices.push_back(0);
 					indices.push_back(i);
 					indices.push_back(i - 1);
-					indices.push_back(0xFFFFFFF);
+					indices.push_back(0xFFFFFFFF);
 				}
 
 				VAOs_[p]->addIBO(indices, GL_LINE_STRIP);
@@ -255,7 +255,7 @@ void PAGRevolutionObject::drawAsLines()
 		if (VAOs_[p])
 		{
 			glEnable(GL_PRIMITIVE_RESTART);
-			glPrimitiveRestartIndex(0xFFFFFFF);
+			glPrimitiveRestartIndex(0xFFFFFFFF);
 			VAOs_[p]->draw(GL_LINE_STRIP, GL_LINE_STRIP);
 		}
 }
@@ -266,7 +266,7 @@ void PAGRevolutionObject::drawAsTriangles()
 		if (VAOs_[p])
 		{
 			glEnable(GL_PRIMITIVE_RESTART);
-			glPrimitiveRestartIndex(0xFFFFFFF);
+			glPrimitiveRestartIndex(0xFFFFFFFF);
 
 			if (p == PAGRevObjParts::PAG_BODY)
 				VAOs_[p]->draw(GL_TRIANGLE_STRIP, GL_TRIANGLE_STRIP);
@@ -338,7 +338,7 @@ std::vector<GLuint> PAGRevolutionObject::calcTriangleStripIndices(unsigned point
 			indices.push_back(i*(slices + 1) + s);
 			indices.push_back(i*(slices + 1) + (s + 1));
 		}
-		indices.push_back(0xFFFFFFF);
+		indices.push_back(0xFFFFFFFF);
 	}
 	return indices;
 }
@@ -350,15 +350,15 @@ std::vector<GLuint> PAGRevolutionObject::calcLineStripIndices(unsigned points, u
 	{
 		for (unsigned s = 0; s <= slices; ++s)
 			indices.push_back(i*(slices + 1) + s);
-		indices.push_back(0xFFFFFFF);
+		indices.push_back(0xFFFFFFFF);
 	}
 
-	for (unsigned s = 0; s <= slices; ++s)
+	for (unsigned s = 0; s < slices; ++s)
 	{
 		for (unsigned i = 0; i < points; ++i)
 			indices.push_back(i*(slices + 1) + s);
 
-		indices.push_back(0xFFFFFFF);
+		indices.push_back(0xFFFFFFFF);
 	}
 	return indices;
 }
