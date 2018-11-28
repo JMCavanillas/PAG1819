@@ -42,9 +42,11 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 	// tecla pulsada tenga que ver con el redibujo de escena
 	if (key == GLFW_KEY_RIGHT_BRACKET && action == GLFW_PRESS)
 		PAGRenderer::getInstance()->zoom(3);
+		PAGRenderer::getInstance()->refresh();
 
 	if (key == GLFW_KEY_SLASH && action == GLFW_PRESS)
 		PAGRenderer::getInstance()->zoom(-3);
+		PAGRenderer::getInstance()->refresh();
 
 	if (key == GLFW_KEY_N && action == GLFW_PRESS)
 	{
@@ -79,6 +81,37 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_A && action == GLFW_PRESS)
 	{
 		PAGRenderer::getInstance()->setView(PAGDrawingMode::PAG_POINT_LINE_TRIANGLE_VIEW);
+		PAGRenderer::getInstance()->refresh();
+	}
+	if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
+	{
+		PAGRenderer::getInstance()->pan(5);
+		PAGRenderer::getInstance()->refresh();
+	}
+	if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
+	{
+		PAGRenderer::getInstance()->pan(-5);
+		PAGRenderer::getInstance()->refresh();
+	}
+	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+	{
+		PAGRenderer::getInstance()->tilt(-5);
+		PAGRenderer::getInstance()->refresh();
+	}
+	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+	{
+		PAGRenderer::getInstance()->tilt(5);
+		PAGRenderer::getInstance()->refresh();
+	}
+
+	if (key == GLFW_KEY_O && action == GLFW_PRESS)
+	{
+		PAGRenderer::getInstance()->orbit(-5);
+		PAGRenderer::getInstance()->refresh();
+	}
+	if (key == GLFW_KEY_L && action == GLFW_PRESS)
+	{
+		PAGRenderer::getInstance()->orbit(5);
 		PAGRenderer::getInstance()->refresh();
 	}
 }

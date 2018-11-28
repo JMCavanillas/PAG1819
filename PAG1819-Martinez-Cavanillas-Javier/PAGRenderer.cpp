@@ -25,7 +25,7 @@ void PAGRenderer::refresh()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glm::mat4 m = glm::perspective(glm::radians(20.0f), float(viewport_width) / float(viewport_height), 1.0f, 300.0f) * cameras_[currentCamera_];
+	glm::mat4 m = cameras_[currentCamera_].getPerspective() * cameras_[currentCamera_].getVision();
 
 	switch (currentView_)
 	{
@@ -102,6 +102,10 @@ void PAGRenderer::change_viewport_size(int width, int height)
 	viewport_height = height;
 	viewport_width = width;
 	glViewport(0, 0, width, height);
+	
+	for (PAGCamera& camera : cameras_)
+		camera.setViewport(width, height);
+
 }
 
 void PAGRenderer::prepareOpenGL()
@@ -136,8 +140,8 @@ void PAGRenderer::prepareOpenGL()
 
 	// Establecemos cámaras
 	currentCamera_ = 0;
-	cameras_.push_back(glm::lookAt(glm::vec3(0, 10, 35), glm::vec3(0, 3, 0), glm::vec3(0, 1, 0)));
-	cameras_.push_back(glm::lookAt(glm::vec3(0, 14, 0), glm::vec3(0, 0, 0), glm::vec3(1, 0, 0)));
+	cameras_.push_back(PAGCamera());
+	cameras_.push_back(PAGCamera(glm::vec3(0, 26,0), glm::vec3(0,5,0), glm::vec3(0,0,-1), 1, 200, 60));
 }
 
 void PAGRenderer::pointShaderConfig(float point_size, const glm::vec3& color, const glm::mat4& view_matrix)
@@ -217,9 +221,24 @@ void PAGRenderer::button_released(int button)
 	std::cout << "Soltado el boton: " << button << std::endl;
 }
 
-void PAGRenderer::zoom(int cantidad)
+void PAGRenderer::tilt(float degrees)
 {
-	std::cout << "Zoom: " << cantidad << std::endl;
+	cameras_[currentCamera_].tilt(degrees);
+}
+
+void PAGRenderer::pan(float degrees)
+{
+	cameras_[currentCamera_].pan(degrees);
+}
+
+void PAGRenderer::orbit(float degrees)
+{
+	cameras_[currentCamera_].orbit(degrees);
+}
+
+void PAGRenderer::zoom(int factor)
+{
+	cameras_[currentCamera_].zoom(factor);
 }
 
 

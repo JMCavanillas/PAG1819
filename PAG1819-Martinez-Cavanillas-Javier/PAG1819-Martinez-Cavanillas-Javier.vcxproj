@@ -124,6 +124,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PAG3DElement.cpp" />
+    <ClCompile Include="PAG3DGroup.cpp" />
+    <ClCompile Include="PAGCamera.cpp" />
+    <ClCompile Include="PAGMaterial.cpp" />
     <ClCompile Include="PAGRenderer.cpp" />
     <ClCompile Include="PAGRevolutionObject.cpp" />
     <ClCompile Include="PAGShaderProgram.cpp" />
@@ -131,7 +135,11 @@
     <ClCompile Include="PAGVao.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="PAG3DElement.h" />
+    <ClInclude Include="PAG3DGroup.h" />
+    <ClInclude Include="PAGCamera.h" />
     <ClInclude Include="PAGEnumeration.h" />
+    <ClInclude Include="PAGMaterial.h" />
     <ClInclude Include="PAGRenderer.h" />
     <ClInclude Include="PAGRevolutionObject.h" />
     <ClInclude Include="PAGShaderProgram.h" />

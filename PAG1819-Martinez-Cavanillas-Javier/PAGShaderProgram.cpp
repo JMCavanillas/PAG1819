@@ -80,14 +80,14 @@ bool PAGShaderProgram::use()
 	}
 }
 
-bool PAGShaderProgram::setUniform(std::string name, GLint value) 
+bool PAGShaderProgram::setUniform(std::string name, GLint value) const
 {
 	// - Para asignar valor a un uniform, primero hay que buscar si en el shader
 	// program existe alguna variable de tipo uniform cuyo nombre coincida con
 	// el que pasamos como argumento
 	GLint location = glGetUniformLocation(handler, name.c_str());
 	// - Si location es un valor positivo, es que existe el uniform y podemos
-// asignarlo
+	// asignarlo
 	if (location >= 0) {
 		// - Aquí usamos la función glUniform que recibe un argumento de tipo GLint
 		glUniform1i(location, value);
@@ -99,7 +99,7 @@ bool PAGShaderProgram::setUniform(std::string name, GLint value)
 	}
 }
 
-bool PAGShaderProgram::setUniform(std::string name, GLfloat value) 
+bool PAGShaderProgram::setUniform(std::string name, GLfloat value) const
 {
 	GLint location = glGetUniformLocation(handler, name.c_str());
 	if (location >= 0) {
@@ -113,7 +113,7 @@ bool PAGShaderProgram::setUniform(std::string name, GLfloat value)
 	}
 }
 
-bool PAGShaderProgram::setUniform(std::string name, glm::mat4 value) 
+bool PAGShaderProgram::setUniform(std::string name, glm::mat4 value) const
 {
 	GLint location = glGetUniformLocation(handler, name.c_str());
 	if (location >= 0) {
@@ -128,12 +128,27 @@ bool PAGShaderProgram::setUniform(std::string name, glm::mat4 value)
 	}
 }
 
-bool PAGShaderProgram::setUniform(std::string name, glm::vec3 value) 
+bool PAGShaderProgram::setUniform(std::string name, glm::vec3 value) const
 {
 	GLint location = glGetUniformLocation(handler, name.c_str());
 	if (location >= 0) {
 		// - Aquí usamos la función glUniform que recibe un argumento de tipo
 		// vec3 con valores GLfloat y expresado como un array
+		glUniform3fv(location, 1, &value[0]);
+		return true;
+	}
+	else {
+		std::cout << "Cannot find localization for: " << name << std::endl;
+		return false;
+	}
+}
+
+bool PAGShaderProgram::setUniform(std::string name, glm::vec4 value) const
+{
+	GLint location = glGetUniformLocation(handler, name.c_str());
+	if (location >= 0) {
+		// - Aquí usamos la función glUniform que recibe un argumento de tipo
+		// vec4 con valores GLfloat y expresado como un array
 		glUniform3fv(location, 1, &value[0]);
 		return true;
 	}

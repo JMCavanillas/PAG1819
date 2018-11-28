@@ -3,12 +3,13 @@
 #include <vector>
 #include <GL\glew.h>
 #include <glm.hpp>
+#include "PAG3DElement.h"
 #include "PAGSubdivisionProfile.h"
 #include "PAGEnumeration.h"
 #include "PAGStructures.h"
 #include "PAGVao.h"
 
-class PAGRevolutionObject
+class PAGRevolutionObject : public PAG3DElement
 {
     private:
 		std::vector<glm::vec3> revolution(const std::vector<glm::vec2>& points, unsigned start, unsigned end);

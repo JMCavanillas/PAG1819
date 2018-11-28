@@ -43,10 +43,12 @@ class PAGShaderProgram
 
 		// - Los siguientes métodos están sobrecargados. Permiten asignar
 		// parámetros de tipo uniform al shader.
-		bool setUniform(std::string name, GLfloat value);
-		bool setUniform(std::string name, GLint value);
-		bool setUniform(std::string name, glm::mat4 value);
-		bool setUniform(std::string name, glm::vec3 value);
+		bool setUniform(std::string name, GLfloat value) const;
+		bool setUniform(std::string name, GLint value) const;
+		bool setUniform(std::string name, glm::mat4 value) const;
+		bool setUniform(std::string name, glm::vec3 value) const;
+
+		bool setUniform(std::string name, glm::vec4 value) const;
 
 		PAGShaderProgram();
 		~PAGShaderProgram();
