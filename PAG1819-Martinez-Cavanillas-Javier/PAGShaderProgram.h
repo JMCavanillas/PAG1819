@@ -39,7 +39,7 @@ class PAGShaderProgram
 		// - Activa el shader program. A partir de ese momento y hasta que no se
 		// active un shader program distinto, las órdenes de dibujo se
 		// procesarán siguiendo las instrucciones de este programa.
-		bool use();
+		bool use() const;
 
 		// - Los siguientes métodos están sobrecargados. Permiten asignar
 		// parámetros de tipo uniform al shader.

@@ -2,9 +2,9 @@
 
 PAGMaterial::PAGMaterial()
 {
-	Kd_ = glm::vec4(0);
-	Ks_ = glm::vec4(0);
-	shininess_ = 0;
+	Kd_ = glm::vec4(0.4, 0.2, 0.3, 1);
+	Ks_ = glm::vec4(0.3);
+	shininess_ = 2;
 }
 
 PAGMaterial::PAGMaterial(const glm::vec4 & Kd, const glm::vec4 & Ks, float shininess)

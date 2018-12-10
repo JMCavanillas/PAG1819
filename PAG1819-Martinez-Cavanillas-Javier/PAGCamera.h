@@ -4,10 +4,13 @@
 class PAGCamera
 {
 	private:
-		int viewport_width_;
-		int viewport_height_;
+		int viewportWidth_;
+		int viewportHeight_;
 
-		glm::mat4 mVision_orig_;
+		glm::vec3 position_;
+		glm::vec3 up_;
+		glm::vec3 u_;
+		glm::vec3 n_;
 		glm::vec3 lookAt_;
 
 		float near_;
@@ -17,18 +20,23 @@ class PAGCamera
 		glm::mat4 mVision_;
 		glm::mat4 mPerspective_;
 
+		void initVision();
+		void updateVision();
+
 	public:
 		PAGCamera();
-		PAGCamera(const glm::vec3& position, const glm::vec3& lookAt, const glm::vec3& up, float near, float far, float fov);
+		PAGCamera(const glm::vec3& position, const glm::vec3& lookAt, float near, float far, float fov);
 		~PAGCamera();
 
 		void orbit(float angle, bool onDegrees = true);
+		void orbit_y(float angle, bool onDegrees = true);
 		void pan(float angle, bool onDegrees = true);
 		void tilt(float angle, bool onDegrees = true);
+		void roll(float angle, bool onDegrees = true);
 
 		void truck(float distance);
 		void dolly(float distance);
-		void boom_crane(float distance);
+		void boom(float distance);
 
 		void zoom(int units);
 
@@ -37,6 +45,9 @@ class PAGCamera
 		glm::vec3 getU();
 		glm::vec3 getLookAtDirection();
 		glm::vec3 getLookAt();
+
+		float getFar();
+		float getNear();
 
 		void setViewport(int width, int height);
 		void setNear(float distance);

@@ -1,7 +1,5 @@
 #include "PAGVao.h"
 
-
-
 PAGVao::PAGVao(const std::vector<PAGPosNorm>& posNorm, const std::vector<glm::vec3>& tangents, const std::vector<glm::vec2>& textCoord)
 {
 	glGenVertexArrays(1, &id_);
@@ -36,7 +34,7 @@ PAGVao::~PAGVao()
 {
 }
 
-void PAGVao::addIBO(const std::vector<GLuint> ibo, int name_id)
+void PAGVao::addIBO(const std::vector<GLuint>& ibo, int name_id)
 {
 	if (IBOs_.find(name_id) != IBOs_.end())
 		return;

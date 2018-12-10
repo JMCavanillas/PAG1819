@@ -66,7 +66,7 @@ GLuint PAGShaderProgram::createShaderProgram(const char *fileName)
 	return handler;
 }
 
-bool PAGShaderProgram::use() 
+bool PAGShaderProgram::use() const
 {
 	// - Antes de activar un shader program para su uso, hay que comprobar
 	// si se ha creado bien y se ha enlazado bien
@@ -149,7 +149,7 @@ bool PAGShaderProgram::setUniform(std::string name, glm::vec4 value) const
 	if (location >= 0) {
 		// - Aquí usamos la función glUniform que recibe un argumento de tipo
 		// vec4 con valores GLfloat y expresado como un array
-		glUniform3fv(location, 1, &value[0]);
+		glUniform4fv(location, 1, &value[0]);
 		return true;
 	}
 	else {

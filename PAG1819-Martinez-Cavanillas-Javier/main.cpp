@@ -11,6 +11,11 @@ extern "C" {
 	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 }
 
+bool primary_mouse_bt_clicked = false;
+bool secondary_mouse_bt_clicked = false;
+
+double click_mouse_pos_x = 0;
+double click_mouse_pos_y = 0;
 
 // - Esta función callback será llamada cada vez que el área de dibujo
 // OpenGL deba ser redibujada.
@@ -28,7 +33,7 @@ void window_refresh_callback(GLFWwindow *window) {
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 
 	PAGRenderer::getInstance()->change_viewport_size(width, height);
-	std::cout << "Resize callback called" << std::endl;
+	// std::cout << "Resize callback called" << std::endl;
 }
 
 // - Esta función callback será llamada cada vez que se pulse una tecla
@@ -41,12 +46,16 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 	// lo que llamará a la función necesaria de PAGRenderer solo si es necesario porque la 
 	// tecla pulsada tenga que ver con el redibujo de escena
 	if (key == GLFW_KEY_RIGHT_BRACKET && action == GLFW_PRESS)
+	{
 		PAGRenderer::getInstance()->zoom(3);
 		PAGRenderer::getInstance()->refresh();
+	}
 
 	if (key == GLFW_KEY_SLASH && action == GLFW_PRESS)
+	{
 		PAGRenderer::getInstance()->zoom(-3);
 		PAGRenderer::getInstance()->refresh();
+	}
 
 	if (key == GLFW_KEY_N && action == GLFW_PRESS)
 	{
@@ -73,7 +82,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 		PAGRenderer::getInstance()->setView(PAGDrawingMode::PAG_LINE_VIEW);
 		PAGRenderer::getInstance()->refresh();
 	}
-	if (key == GLFW_KEY_T && action == GLFW_PRESS)
+	if (key == GLFW_KEY_F && action == GLFW_PRESS)
 	{
 		PAGRenderer::getInstance()->setView(PAGDrawingMode::PAG_FRONT_FACE_VIEW);
 		PAGRenderer::getInstance()->refresh();
@@ -85,12 +94,12 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 	}
 	if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
 	{
-		PAGRenderer::getInstance()->pan(5);
+		PAGRenderer::getInstance()->pan(-5);
 		PAGRenderer::getInstance()->refresh();
 	}
 	if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
 	{
-		PAGRenderer::getInstance()->pan(-5);
+		PAGRenderer::getInstance()->pan(5);
 		PAGRenderer::getInstance()->refresh();
 	}
 	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
@@ -104,14 +113,30 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 		PAGRenderer::getInstance()->refresh();
 	}
 
-	if (key == GLFW_KEY_O && action == GLFW_PRESS)
+	if (key == GLFW_KEY_K && action == GLFW_PRESS)
 	{
-		PAGRenderer::getInstance()->orbit(-5);
+		PAGRenderer::getInstance()->truck(1);
 		PAGRenderer::getInstance()->refresh();
 	}
-	if (key == GLFW_KEY_L && action == GLFW_PRESS)
+	if (key == GLFW_KEY_H && action == GLFW_PRESS)
 	{
-		PAGRenderer::getInstance()->orbit(5);
+		PAGRenderer::getInstance()->truck(-1);
+		PAGRenderer::getInstance()->refresh();
+	}
+
+	if (key == GLFW_KEY_U && action == GLFW_PRESS)
+	{
+		PAGRenderer::getInstance()->boom(1);
+		PAGRenderer::getInstance()->refresh();
+	}
+	if (key == GLFW_KEY_J && action == GLFW_PRESS)
+	{
+		PAGRenderer::getInstance()->boom(-1);
+		PAGRenderer::getInstance()->refresh();
+	}
+	if (key == GLFW_KEY_T && action == GLFW_PRESS)
+	{
+		PAGRenderer::getInstance()->setView(PAGDrawingMode::PAG_TRIANGLE_VIEW);
 		PAGRenderer::getInstance()->refresh();
 	}
 }
@@ -121,9 +146,18 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
 	if (action == GLFW_PRESS) {
 		PAGRenderer::getInstance()->button_clicked(button);
+		if (button == 0)
+			primary_mouse_bt_clicked = true;
+
+		if (button == 1)
+			secondary_mouse_bt_clicked = true;
+
+		glfwGetCursorPos(window, &click_mouse_pos_x, &click_mouse_pos_y);
 	}
 	else if (action == GLFW_RELEASE) {
 		PAGRenderer::getInstance()->button_released(button);
+		primary_mouse_bt_clicked = false;
+		secondary_mouse_bt_clicked = false;
 	}
 }
 
@@ -131,12 +165,11 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 // del ratón sobre el área de dibujo OpenGL.
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
 	if (yoffset > 0)
-		PAGRenderer::getInstance()->zoom(3);
+		PAGRenderer::getInstance()->dolly(-6);
 	else
-		PAGRenderer::getInstance()->zoom(-3);
+		PAGRenderer::getInstance()->dolly(6);
 
-	std::cout << "Movida la rueda del raton " << xoffset <<
-		" Unidades en horizontal y " << yoffset << " unidades en vertical" << std::endl;
+	PAGRenderer::getInstance()->refresh();
 }
 
 int main() {
@@ -202,6 +235,28 @@ int main() {
 	// ventana principal deba cerrarse, por ejemplo, si el usuario pulsa el
 	// botón de cerrar la ventana (la X).
 	while (!glfwWindowShouldClose(window)) {
+		if (primary_mouse_bt_clicked) {
+			double xpos, ypos;
+			//getting cursor position
+			glfwGetCursorPos(window, &xpos, &ypos);
+
+			float displacement = (xpos / width) - (click_mouse_pos_x / width);
+
+			PAGRenderer::getInstance()->orbit(20 * displacement);
+			PAGRenderer::getInstance()->refresh();
+		}
+		if (secondary_mouse_bt_clicked) {
+			double xpos, ypos;
+			//getting cursor position
+			glfwGetCursorPos(window, &xpos, &ypos);
+
+			float displacement_x = (xpos / width) - (click_mouse_pos_x / width);
+			float displacement_y = (ypos / height) - (click_mouse_pos_y / height);
+
+			PAGRenderer::getInstance()->truck(8 * displacement_x);
+			PAGRenderer::getInstance()->boom(-8 * displacement_y);
+			PAGRenderer::getInstance()->refresh();
+		}
 		// - GLFW usa un doble buffer para que no haya parpadeo. Esta orden
 		// intercambia el buffer back (que se ha estado dibujando) por el
 		// que se mostraba hasta ahora front.

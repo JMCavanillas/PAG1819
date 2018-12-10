@@ -10,6 +10,9 @@ const double PI = 3.14159265358979323846;
  */
 PAGRevolutionObject::PAGRevolutionObject(std::vector<glm::vec2> points, unsigned subdivisions, unsigned slices)
 {
+	modelMatrix_ = glm::mat4(1);
+	material_ = PAGMaterial();
+
 	initialProfile_ = PAGSubdivisionProfile(points);
 	refinedProfile_ = initialProfile_.subdivide(subdivisions);
 
@@ -171,12 +174,27 @@ PAGRevolutionObject::PAGRevolutionObject(std::vector<glm::vec2> points, unsigned
 		}
 }
 
+PAGRevolutionObject::PAGRevolutionObject(std::vector<glm::vec2> points, unsigned subdivisions, unsigned slices, const glm::mat4 & model_matrix)
+	: PAGRevolutionObject(points, subdivisions, slices)
+{
+	modelMatrix_ = model_matrix;
+}
+
+PAGRevolutionObject::PAGRevolutionObject(std::vector<glm::vec2> points, unsigned subdivisions, unsigned slices, const glm::mat4 & model_matrix, const PAGMaterial & material)
+	: PAGRevolutionObject(points, subdivisions, slices, model_matrix)
+{
+	material_ = material;
+}
+
 PAGRevolutionObject::PAGRevolutionObject(const PAGRevolutionObject & orig)
 {
 	initialProfile_ = orig.initialProfile_;
 	refinedProfile_ = orig.refinedProfile_;
 	subdivisions_ = orig.subdivisions_;
 	slices_ = orig.slices_;
+
+	material_ = orig.material_;
+	modelMatrix_ = orig.modelMatrix_;
 
 	for (unsigned i = 0; i < 3; ++i)
 	{
@@ -242,15 +260,17 @@ void PAGRevolutionObject::exportPosNorm(PAGRevObjParts part)
 		
 }
 
-void PAGRevolutionObject::drawAsPoints()
+void PAGRevolutionObject::drawAsPoints(const PAGShaderProgram& shader, const glm::mat4& vp_matrix, const glm::mat4& v_matrix)
 {
+	shader.setUniform("mModelViewProj",  vp_matrix * modelMatrix_);
 	for (unsigned p = 0; p < 3; ++p)
 		if (VAOs_[p])
 			VAOs_[p]->draw(GL_POINTS, GL_POINTS);
 }
 
-void PAGRevolutionObject::drawAsLines()
+void PAGRevolutionObject::drawAsLines(const PAGShaderProgram& shader, const glm::mat4& vp_matrix, const glm::mat4& v_matrix)
 {
+	shader.setUniform("mModelViewProj", vp_matrix * modelMatrix_);
 	for (unsigned p = 0; p < 3; ++p)
 		if (VAOs_[p])
 		{
@@ -260,8 +280,11 @@ void PAGRevolutionObject::drawAsLines()
 		}
 }
 
-void PAGRevolutionObject::drawAsTriangles()
+void PAGRevolutionObject::drawAsTriangles(const PAGShaderProgram& shader, const glm::mat4& vp_matrix, const glm::mat4& v_matrix)
 {
+	material_.apply(shader);
+	shader.setUniform("mModelViewProj", vp_matrix * modelMatrix_);
+	shader.setUniform("mModelView", v_matrix * modelMatrix_);
 	for (unsigned p = 0; p < 3; ++p)
 		if (VAOs_[p])
 		{

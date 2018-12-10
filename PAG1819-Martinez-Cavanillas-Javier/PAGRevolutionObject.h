@@ -36,6 +36,9 @@ class PAGRevolutionObject : public PAG3DElement
 
 	public:
 		PAGRevolutionObject(std::vector<glm::vec2> points, unsigned subdivisions, unsigned slices);
+		PAGRevolutionObject(std::vector<glm::vec2> points, unsigned subdivisions, unsigned slices, const glm::mat4& model_matrix);
+		PAGRevolutionObject(std::vector<glm::vec2> points, unsigned subdivisions, unsigned slices, const glm::mat4& model_matrix, 
+			const PAGMaterial& material);
 		PAGRevolutionObject(const PAGRevolutionObject& orig);
 
 		bool isValid();
@@ -45,9 +48,9 @@ class PAGRevolutionObject : public PAG3DElement
 
 		void exportPosNorm(PAGRevObjParts part);
 
-		void drawAsPoints();
-		void drawAsLines();
-		void drawAsTriangles();
+		void drawAsPoints(const PAGShaderProgram& shader, const glm::mat4& vp_matrix, const glm::mat4& v_matrix);
+		void drawAsLines(const PAGShaderProgram& shader, const glm::mat4& vp_matrix, const glm::mat4& v_matrix);
+		void drawAsTriangles(const PAGShaderProgram& shader, const glm::mat4& vp_matrix, const glm::mat4& v_matrix);
 
 		virtual ~PAGRevolutionObject();
 };

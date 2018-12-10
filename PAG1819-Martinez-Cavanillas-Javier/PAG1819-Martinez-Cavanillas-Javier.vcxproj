@@ -124,38 +124,67 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MaterialLibrary.cpp" />
     <ClCompile Include="PAG3DElement.cpp" />
     <ClCompile Include="PAG3DGroup.cpp" />
+    <ClCompile Include="PAGAmbientLightApplier.cpp" />
     <ClCompile Include="PAGCamera.cpp" />
+    <ClCompile Include="PAGDirLightApplier.cpp" />
+    <ClCompile Include="PAGLightSource.cpp" />
     <ClCompile Include="PAGMaterial.cpp" />
+    <ClCompile Include="PAGPlane.cpp" />
+    <ClCompile Include="PAGPointLightApplier.cpp" />
     <ClCompile Include="PAGRenderer.cpp" />
     <ClCompile Include="PAGRevolutionObject.cpp" />
+    <ClCompile Include="PAGShaderCollection.cpp" />
     <ClCompile Include="PAGShaderProgram.cpp" />
+    <ClCompile Include="PAGSpotLightApplier.cpp" />
     <ClCompile Include="PAGSubdivisionProfile.cpp" />
     <ClCompile Include="PAGVao.cpp" />
+    <ClCompile Include="sceneObjects.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MaterialLibrary.h" />
     <ClInclude Include="PAG3DElement.h" />
     <ClInclude Include="PAG3DGroup.h" />
+    <ClInclude Include="PAGAmbientLightApplier.h" />
     <ClInclude Include="PAGCamera.h" />
+    <ClInclude Include="PAGDirLightApplier.h" />
     <ClInclude Include="PAGEnumeration.h" />
+    <ClInclude Include="PAGLightApplier.h" />
+    <ClInclude Include="PAGLightSource.h" />
     <ClInclude Include="PAGMaterial.h" />
+    <ClInclude Include="PAGPlane.h" />
+    <ClInclude Include="PAGPointLightApplier.h" />
     <ClInclude Include="PAGRenderer.h" />
     <ClInclude Include="PAGRevolutionObject.h" />
+    <ClInclude Include="PAGShaderCollection.h" />
     <ClInclude Include="PAGShaderProgram.h" />
+    <ClInclude Include="PAGSpotLightApplier.h" />
     <ClInclude Include="PAGStructures.h" />
     <ClInclude Include="PAGSubdivisionProfile.h" />
     <ClInclude Include="PAGVao.h" />
+    <ClInclude Include="sceneObjects.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ambientLightAds-frag.glsl" />
+    <None Include="ambientLightAds-vert.glsl" />
+    <None Include="dirLightAds-frag.glsl" />
+    <None Include="dirLightAds-vert.glsl" />
+    <None Include="fogShader-frag.glsl" />
+    <None Include="fogShader-vert.glsl" />
     <None Include="lineShader-frag.glsl" />
     <None Include="lineShader-vert.glsl" />
     <None Include="magicShader-frag.glsl" />
     <None Include="magicShader-vert.glsl" />
     <None Include="normalsAsColor-frag.glsl" />
     <None Include="normalsAsColor-vert.glsl" />
+    <None Include="pointLightAds-frag.glsl" />
+    <None Include="pointLightAds-vert.glsl" />
     <None Include="pointShader-frag.glsl" />
     <None Include="pointShader-vert.glsl" />
+    <None Include="spotLightAds-frag.glsl" />
+    <None Include="spotLightAds-vert.glsl" />
     <None Include="tangentsAsColor-frag.glsl" />
     <None Include="tangentsAsColor-vert.glsl" />
     <None Include="textCoordsAsColors-frag.glsl" />

@@ -1,39 +1,87 @@
 #include "PAGCamera.h"
 #include "gtc/matrix_transform.hpp"
 #include "gtc/matrix_access.hpp"
+#include "gtc/constants.hpp"
+
+// Inicializa la matriz de visión, (no necesita up)
+void PAGCamera::initVision()
+{
+	n_ = glm::normalize(position_ - lookAt_);
+	float eps = glm::epsilon<float>();
+	glm::vec3 bound = glm::vec3(eps, eps, eps);
+	glm::vec3 y_positive = glm::vec3(0, 1, 0);
+	glm::vec3 z_positive = glm::vec3(0, 0, 1);
+
+	bool equal_y_positive = glm::all(glm::greaterThan(n_, y_positive - bound)) 
+		&& glm::all(glm::lessThan(n_, y_positive + bound));
+	bool equal_y_negative = glm::all(glm::greaterThan(n_, -y_positive - bound))
+		&& glm::all(glm::lessThan(n_, -y_positive + bound));
+
+	if (equal_y_positive)
+		u_ = glm::cross(z_positive, n_);
+	else if (equal_y_negative)
+		u_ = glm::cross(-z_positive, n_);
+	else
+		u_ = glm::cross(y_positive, n_);
+
+	u_ = glm::normalize(u_);
+	up_ = glm::cross(n_, u_);
+
+	// Ya que hemos calculado todo formaremos la matriz manualmente
+	mVision_ = glm::row(mVision_, 0, glm::vec4(u_, -glm::dot(u_, position_)));
+	mVision_ = glm::row(mVision_, 1, glm::vec4(up_, -glm::dot(up_, position_)));
+	mVision_ = glm::row(mVision_, 2, glm::vec4(n_, -glm::dot(n_, position_)));
+	mVision_ = glm::row(mVision_, 3, glm::vec4(0, 0, 0, 1));
+
+	//mVision_ = glm::lookAt(position_, lookAt_, up_);
+}
+
+// Actualiza la matriz de vision
+void PAGCamera::updateVision()
+{
+	n_ = glm::normalize(position_ - lookAt_);
+	up_ = glm::cross(n_, u_);
+	u_ = glm::cross(up_, n_);
+
+	// Ya que hemos calculado todo formaremos la matriz manualmente
+	mVision_ = glm::row(mVision_, 0, glm::vec4(u_, -glm::dot(u_, position_)));
+	mVision_ = glm::row(mVision_, 1, glm::vec4(up_, -glm::dot(up_, position_)));
+	mVision_ = glm::row(mVision_, 2, glm::vec4(n_, -glm::dot(n_, position_)));
+	mVision_ = glm::row(mVision_, 3, glm::vec4(0, 0, 0, 1));
+
+	//mVision_ = glm::lookAt(position_, lookAt_, up_);
+}
 
 // Public Methods
 PAGCamera::PAGCamera()
 {
-	glm::vec3 position_ = glm::vec3(0, 3, 15);
-	lookAt_ = glm::vec3(0, 3, 0);
-	glm::vec3 up_ = glm::vec3(0, 1, 0);
+	position_ = glm::vec3(0, 0, 17);
+	lookAt_ = glm::vec3(0, 0, 0);
 
-	viewport_width_ = 1080;
-	viewport_height_ = 720;
+	viewportWidth_ = 1080;
+	viewportHeight_ = 720;
 
 	near_ = 1.0f;
 	far_ = 300.0f;
-	fov_ = glm::radians(50.0f);
+	setVisionAngle(60.0f);
 
-	mVision_ = glm::lookAt(position_, lookAt_, up_);
+	initVision();
 	updatePerspective();
 }
 
-PAGCamera::PAGCamera(const glm::vec3& position, const glm::vec3& lookAt, const glm::vec3& up, float near, float far, float fovX)
+PAGCamera::PAGCamera(const glm::vec3& position, const glm::vec3& lookAt, float near, float far, float fovX)
 {
-	glm::vec3 position_ = position;
-	glm::vec3 lookAt_ = lookAt;
-	glm::vec3 up_ = up;
+	position_ = position;
+	lookAt_ = lookAt;
 
-	viewport_width_ = 1080;
-	viewport_height_ = 720;
+	viewportWidth_ = 1080;
+	viewportHeight_ = 720;
 
 	near_ = near;
 	far_ = far;
 	setVisionAngle(fovX);
 
-	mVision_ = glm::lookAt(position_, lookAt_, up_);
+	initVision();
 	updatePerspective();
 }
 
@@ -47,13 +95,29 @@ void PAGCamera::orbit(float angle, bool onDegrees)
 	if (onDegrees)
 		angle = glm::radians(angle);
 
-	glm::vec3 position_ = getPosition();
+	glm::mat4 identity = glm::mat4(1);
 
-	glm::mat4 transform = glm::translate(glm::mat4(1), position_);
-	transform = glm::rotate(glm::mat4(1), angle, glm::vec3(0, 1, 0)) * transform;
-	transform = glm::translate(glm::mat4(1), -position_) * transform;
-	
-	mVision_ = transform * mVision_;
+	glm::mat4 transform = identity;
+	transform = glm::rotate(identity, angle, up_);
+	position_ = glm::vec3(transform * glm::vec4(position_, 1));
+	u_ = glm::normalize(glm::vec3(transform * glm::vec4(u_, 1)));
+
+	updateVision();
+}
+
+void PAGCamera::orbit_y(float angle, bool onDegrees)
+{
+	if (onDegrees)
+		angle = glm::radians(angle);
+
+	glm::mat4 identity = glm::mat4(1);
+
+	glm::mat4 transform = identity;
+	transform = glm::rotate(identity, angle, glm::vec3(0,1,0));
+	position_ = glm::vec3(transform * glm::vec4(position_, 1));
+	u_ = glm::normalize(glm::vec3(transform * glm::vec4(u_, 1)));
+
+	updateVision();
 }
 
 void PAGCamera::pan(float angle, bool onDegrees)
@@ -61,7 +125,17 @@ void PAGCamera::pan(float angle, bool onDegrees)
 	if (onDegrees)
 		angle = glm::radians(angle);
  
-	mVision_ = glm::rotate(glm::mat4(1), angle, glm::vec3(0, 1, 0)) * mVision_;
+	glm::mat4 identity = glm::mat4(1);
+	
+	glm::mat4 rotation = glm::rotate(identity, angle, up_);
+	glm::mat4 transform = identity;
+	transform = glm::translate(identity, -position_); 
+	transform = rotation * transform;
+	transform = glm::translate(identity, position_) * transform;
+
+	lookAt_ = glm::vec3(transform * glm::vec4(lookAt_, 1));
+	u_ = glm::normalize(glm::vec3(rotation * glm::vec4(u_, 1)));
+	updateVision();
 }
 
 void PAGCamera::tilt(float angle, bool onDegrees)
@@ -69,40 +143,69 @@ void PAGCamera::tilt(float angle, bool onDegrees)
 	if (onDegrees)
 		angle = glm::radians(angle);
 
-	mVision_ = glm::rotate(glm::mat4(1), -angle, glm::vec3(1, 0, 0)) * mVision_;
+	glm::mat4 identity = glm::mat4(1);
+
+	glm::mat4 transform = identity;
+	transform = glm::translate(identity, -position_);
+	transform = glm::rotate(identity, angle, u_) * transform;
+	transform = glm::translate(identity, position_) * transform;
+
+	lookAt_ = glm::vec3(transform * glm::vec4(lookAt_, 1));
+	updateVision();
+}
+
+void PAGCamera::roll(float angle, bool onDegrees)
+{
+	if (onDegrees)
+		angle = glm::radians(angle);
+
+	glm::mat4 identity = glm::mat4(1);
+
+	glm::mat4 rotation = glm::rotate(identity, angle, n_);
+	u_ = glm::normalize(glm::vec3(rotation * glm::vec4(u_, 1)));
+
+	updateVision();
 }
 
 void PAGCamera::truck(float distance)
 {
-	glm::mat3 rotation_matrix_ = glm::mat3(mVision_);
-	glm::vec3 displacement = glm::vec3(distance, 0, 0);
-	displacement = rotation_matrix_ * displacement;
-	glm::mat4 translation_matrix = glm::translate(glm::mat4(1), displacement);
+	glm::mat4 identity = glm::mat4(1);
+	glm::mat4 transform = identity;
+	
+	glm::vec3 translation = u_ * distance;
+	transform = glm::translate(identity, translation);
+	lookAt_ = glm::vec3(transform * glm::vec4(lookAt_, 1));
+	position_ = glm::vec3(transform * glm::vec4(position_, 1));
 
-	mVision_ = translation_matrix * mVision_;
-	lookAt_ = glm::vec3(translation_matrix * glm::vec4(lookAt_, 1));
+	updateVision();
 }
 
 void PAGCamera::dolly(float distance)
 {
-	glm::mat3 rotation_matrix_ = glm::mat3(mVision_);
-	glm::vec3 displacement = glm::vec3(0, 0, distance);
-	displacement = rotation_matrix_ * displacement;
-	glm::mat4 translation_matrix = glm::translate(glm::mat4(1), displacement);
+	glm::mat4 identity = glm::mat4(1);
+	glm::mat4 transform = identity;
 
-	mVision_ = translation_matrix * mVision_;
-	lookAt_ = glm::vec3(translation_matrix * glm::vec4(lookAt_, 1));
+	glm::vec3 translation = n_ * distance;
+	transform = glm::translate(identity, translation);
+	//lookAt_ = glm::vec3(transform * glm::vec4(lookAt_, 1));
+	glm::vec3 position = glm::vec3(transform * glm::vec4(position_, 1));
+	if (glm::distance(position, lookAt_) > (near_ + glm::epsilon<float>() + distance) )
+		position_ = position;
+
+	updateVision();
 }
 
-void PAGCamera::boom_crane(float distance)
+void PAGCamera::boom(float distance)
 {
-	glm::mat3 rotation_matrix_ = glm::mat3(mVision_);
-	glm::vec3 displacement = glm::vec3(0, distance, 0);
-	displacement = rotation_matrix_ * displacement;
-	glm::mat4 translation_matrix = glm::translate(glm::mat4(1), displacement);
+	glm::mat4 identity = glm::mat4(1);
+	glm::mat4 transform = identity;
 
-	mVision_ = translation_matrix * mVision_;
-	lookAt_ = glm::vec3(translation_matrix * glm::vec4(lookAt_, 1));
+	glm::vec3 translation = up_ * distance;
+	transform = glm::translate(identity, translation);
+	lookAt_ = glm::vec3(transform * glm::vec4(lookAt_, 1));
+	position_ = glm::vec3(transform * glm::vec4(position_, 1));
+
+	updateVision();
 }
 
 void PAGCamera::zoom(int units)
@@ -118,22 +221,22 @@ void PAGCamera::zoom(int units)
 
 glm::vec3 PAGCamera::getPosition()
 {
-	return -glm::vec3(glm::column(mVision_, 3));
+	return position_;
 }
 
 glm::vec3 PAGCamera::getUp()
 {
-	return glm::vec3(glm::row(mVision_orig_, 1));
+	return up_;
 }
 
 glm::vec3 PAGCamera::getU()
 {
-	return glm::vec3(glm::row(mVision_, 0));
+	return u_;
 }
 
 glm::vec3 PAGCamera::getLookAtDirection()
 {
-	return glm::vec3(glm::row(mVision_, 2));
+	return -n_;
 }
 
 glm::vec3 PAGCamera::getLookAt()
@@ -141,10 +244,20 @@ glm::vec3 PAGCamera::getLookAt()
 	return lookAt_;
 }
 
+float PAGCamera::getFar()
+{
+	return far_;
+}
+
+float PAGCamera::getNear()
+{
+	return near_;
+}
+
 void PAGCamera::setViewport(int width, int height)
 {
-	viewport_width_ = width;
-	viewport_height_ = height;
+	viewportWidth_ = width;
+	viewportHeight_ = height;
 	updatePerspective();
 }
 
@@ -165,14 +278,14 @@ void PAGCamera::setVisionAngle(float angle, bool onDegrees)
 	if (onDegrees)
 		angle = glm::radians(angle);
 
-	fov_ = 2 * glm::atan(glm::tan(angle / 2) / (float(viewport_width_) / viewport_height_));
+	fov_ = 2 * glm::atan(glm::tan(angle / 2) / (float(viewportWidth_) / viewportHeight_));
 	updatePerspective();
 }
 
 
 void PAGCamera::updatePerspective()
 {
-	mPerspective_ = glm::perspective(fov_, float(viewport_width_) / viewport_height_, near_, far_);
+	mPerspective_ = glm::perspective(fov_, float(viewportWidth_) / viewportHeight_, near_, far_);
 }
 
 glm::mat4 PAGCamera::getPerspective()

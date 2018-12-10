@@ -45,6 +45,33 @@
     <ClCompile Include="PAG3DGroup.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
+    <ClCompile Include="PAGLightSource.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="PAGSpotLightApplier.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="PAGDirLightApplier.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="PAGPointLightApplier.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="PAGAmbientLightApplier.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="PAGShaderCollection.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="PAGPlane.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="sceneObjects.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialLibrary.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PAGRenderer.h">
@@ -78,6 +105,36 @@
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="PAG3DGroup.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="PAGLightSource.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="PAGLightApplier.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="PAGSpotLightApplier.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="PAGDirLightApplier.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="PAGPointLightApplier.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="PAGAmbientLightApplier.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="PAGShaderCollection.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="PAGPlane.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="sceneObjects.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialLibrary.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>
@@ -122,6 +179,36 @@
       <Filter>Archivos de recursos</Filter>
     </None>
     <None Include="magicShader-frag.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="pointLightAds-vert.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="pointLightAds-frag.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="ambientLightAds-vert.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="ambientLightAds-frag.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="dirLightAds-vert.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="dirLightAds-frag.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="spotLightAds-vert.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="spotLightAds-frag.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="fogShader-vert.glsl">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="fogShader-frag.glsl">
       <Filter>Archivos de recursos</Filter>
     </None>
   </ItemGroup>

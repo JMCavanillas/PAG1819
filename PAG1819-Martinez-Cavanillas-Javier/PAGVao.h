@@ -17,7 +17,7 @@ class PAGVao
 		PAGVao(const std::vector<PAGPosNorm>& posNorm, const std::vector<glm::vec3>& tangents, const std::vector<glm::vec2>& textCoord);
 		~PAGVao();
 
-		void addIBO(const std::vector<GLuint> ibo, int name_id);
+		void addIBO(const std::vector<GLuint>& ibo, int name_id);
 
 		bool draw(int ibo_name, GLenum mode);
 

@@ -1,42 +1,46 @@
+#pragma once
+
 #include <GL\glew.h>
 #include <iostream>
-#include<vector>
+#include <vector>
+
+#include "PAGEnumeration.h"
+#include "PAGShaderCollection.h"
 #include "PAGShaderProgram.h"
 #include "PAGRevolutionObject.h"
 #include "PAGCamera.h"
+#include "PAGLightSource.h"
 
-#pragma once
+#include "PAGSpotLightApplier.h"
+#include "PAGPointLightApplier.h"
+#include "PAGDirLightApplier.h"
+#include "PAGAmbientLightApplier.h"
+
+#include "PAG3DGroup.h"
+
+
 class PAGRenderer
 {
 		PAGRenderer();
 
 		static PAGRenderer* instance_;
 
-		PAGShaderProgram pointShader_;
-		void pointShaderConfig(float point_size, const glm::vec3& color, const glm::mat4& view_matrix);
-		PAGShaderProgram lineShader_;
-		void lineShaderConfig(const glm::vec3& color, const glm::mat4& view_matrix);
-		PAGShaderProgram triangleFaceShader_;
-		void triangleFaceShaderConfig(const glm::mat4& view_matrix);
-		PAGShaderProgram normalsAsColorShader_;
-		void normalsAsColorShaderConfig(const glm::mat4& view_matrix);
-		PAGShaderProgram tangentsAsColorShader_;
-		void tangentsAsColorShaderConfig(const glm::mat4& view_matrix);
-		PAGShaderProgram textCoordsAsColorShader_;
-		void textCoordsAsColorsShaderConfig(const glm::mat4& view_matrix);
-		PAGShaderProgram magicShader_;
-		void magicShaderConfig(const glm::mat4& view_matrix);
-
 		int viewport_height;
 		int viewport_width;
 
-		PAGCamera camera_;
-
+		PAGShaderCollection shaders_;
 		std::vector<PAGCamera> cameras_;
 		unsigned currentCamera_;
 		int currentView_;
 
-		std::vector<PAGRevolutionObject> sceneObjects_;
+		PAG3DGroup sceneObjects_;
+
+		PAGPointLightApplier pointLightApplier_;
+		PAGDirLightApplier dirLightApplier_;
+		PAGAmbientLightApplier ambientLightApplier_;
+		PAGSpotLightApplier spotLightApplier_;
+		
+		std::vector<PAGLightSource> lights_;
 
 	public:
 		static PAGRenderer* getInstance();
@@ -56,6 +60,9 @@ class PAGRenderer
 
 		void tilt(float degrees);
 		void pan(float degree);
+		void truck(float distance);
+		void boom(float distance);
+		void dolly(float distance);
 		void orbit(float degrees);
 		void zoom(int cantidad);
 
